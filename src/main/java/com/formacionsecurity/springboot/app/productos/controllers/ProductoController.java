@@ -3,6 +3,8 @@ package com.formacionsecurity.springboot.app.productos.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.formacionsecurity.springboot.app.productos.models.dao.UsuarioDTO;
+import com.formacionsecurity.springboot.app.productos.models.service.UsuarioFeign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -16,6 +18,8 @@ import com.formacionsecurity.springboot.app.productos.models.service.IProductoSe
 
 @RestController
 public class ProductoController {
+
+	private final UsuarioFeign usuarioFeign;
 	
 	@Autowired
 	private Environment env;
@@ -25,7 +29,11 @@ public class ProductoController {
 	
 	@Autowired
 	private IProductoService productoService;
-	
+
+	public ProductoController(UsuarioFeign usuarioFeign) {
+		this.usuarioFeign = usuarioFeign;
+	}
+
 	@GetMapping("/listar")
 	public List<Producto> listar(){
 		return productoService.findAll().stream().map(producto ->{
@@ -41,6 +49,11 @@ public class ProductoController {
 		//producto.setPort(Integer.parseInt(env.getProperty("local.server.port")));
 		producto.setPort(port);
 		return producto;
+	}
+
+	@GetMapping("/list-users")
+	public List<UsuarioDTO> listUsers() {
+		return usuarioFeign.getAllUsuarios();
 	}
 
 }
