@@ -7,6 +7,7 @@ import com.formacionsecurity.springboot.app.productos.models.dao.UsuarioDTO;
 import com.formacionsecurity.springboot.app.productos.models.service.UsuarioFeign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.openfeign.FeignClientFactory;
 import org.springframework.core.env.Environment;
 //import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,9 @@ public class ProductoController {
 	
 	@Autowired
 	private IProductoService productoService;
+
+	@Autowired
+	private FeignClientFactory feignClientFactory;
 
 	public ProductoController(UsuarioFeign usuarioFeign) {
 		this.usuarioFeign = usuarioFeign;
@@ -54,6 +58,15 @@ public class ProductoController {
 	@GetMapping("/list-users")
 	public List<UsuarioDTO> listUsers() {
 		return usuarioFeign.getAllUsuarios();
+	}
+
+	@GetMapping("/")
+	public List<Producto> getAllProductos() {
+		return productoService.findAll().stream().map(producto ->{
+			producto.setPort(Integer.parseInt(env.getProperty("local.server.port")));
+			//producto.setPort(port);
+			return producto;
+		}).collect(Collectors.toList());
 	}
 
 }
